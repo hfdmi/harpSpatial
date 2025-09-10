@@ -73,6 +73,8 @@
 #'   this directory.
 #' @param sqlite_file Name of SQLite file.
 #' @param return_data If TRUE, the result is returned as a list of tables.
+#' @param return_fields If TRUE, ob_field and fc_field are added to the list of tables, return_data must set to TRUE.
+#'   To avoid data overflow, this is currently only enabled for ncases=1.
 #' @param ... Not used at thispoint (more info to be added).
 #'
 #' @return A list containting tibbles for all scores.
