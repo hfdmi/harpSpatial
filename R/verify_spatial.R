@@ -81,6 +81,8 @@
 #'   this directory.
 #' @param sqlite_file Name of SQLite file.
 #' @param return_data If TRUE, the result is returned as a list of tables.
+#' @param return_fields If TRUE, ob_field and fc_field are added to the list of tables, return_data must set to TRUE.
+#'   To avoid data overflow, this is currently only enabled for ncases=1.
 #' @param ... Not used at thispoint (more info to be added).
 #'
 #' @return A list containting tibbles for all scores.
@@ -118,7 +120,8 @@ verify_spatial <- function(dttm,
                            thresholds           = harpSpatial_conf$thresholds, #c(0.1, 1, 5, 10),
                            sqlite_path          = harpSpatial_conf$sqlite_path, #NULL,
                            sqlite_file          = harpSpatial_conf$sqlite_file, #"harp_spatial_scores.sqlite",
-                           return_data          = FALSE) {
+                           return_data          = FALSE,
+			   return_fields        = FALSE) {
 
   # TODO: we may need more options! masked interpolation, options by score,
   prm <- harpIO::parse_harp_parameter(parameter)
@@ -489,6 +492,13 @@ verify_spatial <- function(dttm,
   ## write to SQLite
   if (!is.null(sqlite_file)) {
     save_spatial_verif(score_tables, sqlite_path, sqlite_file)
+  }
+
+  if (return_fields && ncases == 1){
+	  score_tables <- append(score_tables, list("ob_field" = obfield))
+	  score_tables <- append(score_tables, list("fc_field" = fcfield))
+  } else if (return_fields && ncases > 1){
+	  warning("NOTE: you are requesting return_fields for more than 1 case. This is currently NOT ENABLED to avoid data overload.")
   }
 
   if (return_data) invisible(score_tables)
