@@ -358,6 +358,8 @@ verify_spatial <- function(dttm,
       obfield <- meteogrid::regrid(obfield, weights = init$regrid_ob)
      }
     }
+    print("obfield:")
+    print(obfield)
 
     # find forecasts valid for this date/time
     # intersect drops the POSIXct class
@@ -441,6 +443,8 @@ verify_spatial <- function(dttm,
         fcfield <- meteogrid::regrid(fcfield, weights = init$regrid_fc)
        }
       }
+      print("fcfield:")
+      print(fcfield)
 
       #############################
       ### NOW WE COMPUTE SCORES ###
@@ -527,6 +531,7 @@ save_spatial_verif <- function(score_tables, sqlite_path, sqlite_file) {
   for (sc in names(score_tables)) {
     # check for score table and create if necessary
     tab <- spatial_score_table(spatial_scores(score = sc))
+    print(tab)
     # drop empty rows (missing cases)
     harpIO:::create_table(db, sc, tab$fields, tab$primary)
     # TODO: should we drop all cases were any field is missing?

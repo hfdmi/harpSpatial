@@ -22,10 +22,18 @@ spatial_score_table <- function(template) {
     "leadtime" = "REAL"
   )
 #  score_fields <- structure(rep("REAL", length(score_names)), names=score_names)
-  score_fields <- rep("REAL", length(template$fields))
-  names(score_fields) <- template$fields
-  primary_fields <- rep("REAL", length(template$primary))
+  if (is.null(template$primarytype)) {
+      primary_fields <- rep("REAL", length(template$primary))
+  } else {
+      primary_fields <- template$primarytype
+  }
   names(primary_fields) <- template$primary
+  if (is.null(template$fieldtype)) {
+      score_fields <- rep("REAL", length(template$fields))
+  } else{
+      score_fields <- template$fieldtype
+  }
+  names(score_fields) <- template$fields
 
   list(
     fields = c(standard_fields, primary_fields, score_fields),

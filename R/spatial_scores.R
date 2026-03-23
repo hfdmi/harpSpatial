@@ -18,7 +18,14 @@ spatial_scores <- function(score = NULL, obfield = NULL, fcfield = NULL, ...) {
                      "FSS"     = list(fields = c("fss"), primary = c("threshold", "scale"),
                                       "func" = "scores_sp_neighborhood", "plot_func" = "plot_fss"),
                      "NACT"    = list(fields = c("hit", "fa", "miss", "cr"), primary = c("threshold", "scale"),
-                                      "func" = "scores_sp_neighborhood", "plot_func" = "plot_nact")
+                                      "func" = "scores_sp_neighborhood", "plot_func" = "plot_nact"),
+#                    Contingency table as function of probability thresholds:
+                     "cont_tab_prob" = list(fields = c("hit", "fa", "miss", "cr"),
+                                            fieldtype = c("INTEGER", "INTEGER", "INTEGER", "INTEGER"),
+                                            primary = c("threshold", "scale", "prob"),
+                                            primarytype = c("REAL", "INTEGER", "REAL"),
+                                            "func" = "contin_tables_for_neighbor_probs",
+                                            "plot_func" = "plot_as_func_of_prob")
 #                     , "FSS_p"     = list(fields = c("percentile", "scale", "fss"), "func" = "score_fss", "plot_func" = "plot_fss")
                      )
 
@@ -58,5 +65,17 @@ scores_sp_neighborhood <- function(obfield, fcfield, thresholds, scales, ...) {
   message("scales", paste(scales, scales=","))
   harpSpatial_neighborhood_scores(obfield=obfield, fcfield=fcfield,
                                   thresholds=thresholds, scales=scales
+  )
+}
+
+##' @export
+contin_tables_for_neighbor_probs <- function(obfield, fcfield, thresholds, scales, probs=seq(0, 1, 0.1), ...) {
+  message("obfield dimensions: ", paste(dim(obfield), collapse="x"))
+  message("fcfield dimensions: ", paste(dim(fcfield), collapse="x"))
+  message("thresholds: ", paste(thresholds, collapse=","))
+  message("scales: ", paste(scales, collapse=","))
+  message("probs: ", paste(probs, collapse=","))
+  harpSpatial_neighborhood_contingency_tables(obfield=obfield, fcfield=fcfield,
+                                              thresholds=thresholds, scales=scales, probs=probs
   )
 }
