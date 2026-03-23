@@ -185,8 +185,10 @@ verify_spatial <- function(dttm,
   # - maybe even a different field -> need a "modifier"???
   # if (!is.null(ob_param$accum)
   ob_param <- prm
-  ob_param$accum <- readr::parse_number(ob_accumulation) *
+  if (!is.null(ob_accumulation)) {
+    ob_param$accum <- readr::parse_number(ob_accumulation) *
                     harpIO:::units_multiplier(ob_accumulation)
+  }
   # FIXME: avoid reading domain information for every file (obs and fc)
   #        BUT: we need it once to initialise the regridding. Use "get_domain(file)".
   # FIXME: should we do the regridding within the read_grid call?
@@ -200,12 +202,14 @@ verify_spatial <- function(dttm,
     )
     # FIXME: first check that the file exists! Avoid Errors. Use 
     try(do.call(harpIO::read_grid,
-                  c(list(file_name        = obfile,
-			 file_format      = ob_file_format,
-			 parameter        = ob_param,
-			 file_format_opts = ob_file_opts,
-			 param_defs       = ob_param_defs))),
-        silent = TRUE) 
+                  c(list(file_name           = obfile,
+			 file_format         = ob_file_format,
+			 parameter           = ob_param,
+			 file_format_opts    = ob_file_opts,
+			 param_defs          = ob_param_defs,
+                         transformation      = "regrid",
+                         transformation_opts = regrid_opts(verif_domain)))),
+        silent = TRUE)
   }
 
   # FIXME: if (!is.null(members) && length(members) > 1)
@@ -227,7 +231,9 @@ verify_spatial <- function(dttm,
             c(list(file_name = fcfile, file_format = fc_file_format,
                        parameter = parameter, lead_time = lead_time,
                        file_format_opts = fc_file_opts,
-		       param_defs = fc_param_defs)))
+		       param_defs = fc_param_defs,
+                       transformation      = "regrid",
+                       transformation_opts = regrid_opts(verif_domain))))
       )
     }
   } else {
@@ -333,7 +339,8 @@ verify_spatial <- function(dttm,
     }
 
     # convert to common verification grid
-    if (!is.null(ob_interp_method)) {
+    if (is.null(verif_domain)) {
+     if (!is.null(ob_interp_method)) {
       if (is.null(init$regrid_ob)) {
         message("Initialising observation regridding.")
         if (is.null(ob_domain)) {
@@ -349,6 +356,7 @@ verify_spatial <- function(dttm,
           method    = ob_interp_method)
       }
       obfield <- meteogrid::regrid(obfield, weights = init$regrid_ob)
+     }
     }
 
     # find forecasts valid for this date/time
@@ -412,7 +420,8 @@ verify_spatial <- function(dttm,
         }
       }
       # convert forecast to common verification grid
-      if (!is.null(fc_interp_method)) {
+      if (is.null(verif_domain)) {
+       if (!is.null(fc_interp_method)) {
         if (is.null(init$regrid_fc)) {
           message("Initialising fc regridding.")
           if (is.null(fc_domain)) {
@@ -430,6 +439,7 @@ verify_spatial <- function(dttm,
             )
         }
         fcfield <- meteogrid::regrid(fcfield, weights = init$regrid_fc)
+       }
       }
 
       #############################
