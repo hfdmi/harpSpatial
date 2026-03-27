@@ -1,27 +1,21 @@
 harpSpatial_neighborhood_contingency_tables <- function(obfield=NULL, fcfield=NULL, thresholds=NULL, scales=0, probs=seq(0, 1, 0.1)) {
 
-    nthresh <- length(thresholds)
-    nscale <- length(scales)
     nprob <- length(probs)
-    for (ithresh in 1:nthresh) {
-        cumsum_ob <- cumsum(obfield, thresholds[ithresh])
-        for (iscale in 1:nscale) { #obmask=1 if threshold is exceeded somewhere in neighbourhood
-            obmask <- window_mask_from_cumsum(cumsum_ob, scales[iscale])
+    for (threshold in thresholds) {
+        cumsum_ob <- cumsum(obfield, threshold)
+        for (scale in scales) { #obmask=1 if threshold is exceeded somewhere in neighbourhood
+            obmask <- window_mask_from_cumsum(cumsum_ob, scale)
             for (iprob in 1:nprob) {
                 prob <- probs[iprob]
-                if (prob == 0) {
-                    fcmask <- 1  * (fcfield > prob)
-                } else {
-                    fcmask <- 1  * (fcfield >= prob)
-                }
+                fcmask <- 1  * (fcfield >= prob)
                 hit <- sum(fcmask * obmask)
                 fa <- sum(fcmask * (1-obmask))
                 miss <- sum((1-fcmask) * obmask)
                 cr <- sum((1-fcmask) * (1-obmask))
                 if (iprob == 1) { #First entry in contingency_table
                     contingency_table <- data.frame(
-                        "threshold" = thresholds[ithresh],
-                        "scale" = scales[iscale],
+                        "threshold" = threshold,
+                        "scale" = scale,
                         "prob" = prob,
                         "hit" = hit,
                         "fa" = fa,
@@ -29,7 +23,7 @@ harpSpatial_neighborhood_contingency_tables <- function(obfield=NULL, fcfield=NU
                         "cr" = cr
                     )
                 } else { #Subsequent entries in contingency_table
-                    contingency_table[nrow(contingency_table)+1,] <- c(thresholds[ithresh], scales[iscale], prob, hit, fa, miss, cr)
+                    contingency_table[nrow(contingency_table)+1,] <- c(threshold, scale, prob, hit, fa, miss, cr)
                 }
             }
         }
