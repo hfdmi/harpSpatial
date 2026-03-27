@@ -20,12 +20,12 @@ spatial_scores <- function(score = NULL, obfield = NULL, fcfield = NULL, ...) {
                      "NACT"    = list(fields = c("hit", "fa", "miss", "cr"), primary = c("threshold", "scale"),
                                       "func" = "scores_sp_neighborhood", "plot_func" = "plot_nact"),
 #                    Contingency table as function of probability thresholds:
-                     "cont_tab_prob" = list(fields = c("hit", "fa", "miss", "cr"),
-                                            fieldtype = c("INTEGER", "INTEGER", "INTEGER", "INTEGER"),
-                                            primary = c("threshold", "scale", "prob"),
-                                            primarytype = c("REAL", "INTEGER", "REAL"),
-                                            "func" = "contin_tables_for_neighbor_probs",
-                                            "plot_func" = "plot_as_func_of_prob")
+                     "prob" = list(fields      = c("hit", "fa", "miss", "cr"),
+                                   fieldtype   = c("INTEGER", "INTEGER", "INTEGER", "INTEGER"),
+                                   primary     = c("threshold", "scale", "prob"),
+                                   primarytype = c("REAL", "INTEGER", "REAL"),
+                                   "func"      = "contin_tables_for_neighbor_probs",
+                                   "plot_func" = "plot_spatial_prob_verif")
 #                     , "FSS_p"     = list(fields = c("percentile", "scale", "fss"), "func" = "score_fss", "plot_func" = "plot_fss")
                      )
 
